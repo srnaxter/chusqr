@@ -5,11 +5,26 @@
     <p class="chusqer-content">
         <img src="{{ $chusqer->image }}" alt="">{{ $chusqer->content }}
     </p>
+
+    @if(Auth::user() && Auth::user()->amI())
+        <form  method="post">
+            {{ csrf_field() }}
+            <button type="submit" class="button">Like</button>
+        </form>
+    @else
+        <form  method="post">
+            {{ csrf_field() }}
+            <button type="submit" class="alert button">Unlike</button>
+        </form>
+    @endif
+
     <p class="chusqer-hashtags text-right">
         @foreach($chusqer->hashtags as $hashtag)
             <a href="/hashtag/{{ $hashtag->slug }}"><span class="label label-primary">{{ $hashtag->slug }}</span></a>
         @endforeach
     </p>
+
+
     @if(Auth::user() && Auth::user()->amI())
     <div class="card-section">
         @can('update', $chusqer)
