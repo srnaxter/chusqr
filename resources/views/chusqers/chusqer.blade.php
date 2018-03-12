@@ -6,27 +6,21 @@
         <img src="{{ $chusqer->image }}" alt="">{{ $chusqer->content }}
     </p>
 
-    @if(Auth::user() && Auth::user()->amI())
-        <form  method="post">
-            {{ csrf_field() }}
-            <button type="submit" class="button">Like</button>
-        </form>
-    @else
-        <form  method="post">
-            {{ csrf_field() }}
-            <button type="submit" class="alert button">Unlike</button>
-        </form>
-    @endif
-
     <p class="chusqer-hashtags text-right">
         @foreach($chusqer->hashtags as $hashtag)
             <a href="/hashtag/{{ $hashtag->slug }}"><span class="label label-primary">{{ $hashtag->slug }}</span></a>
         @endforeach
     </p>
-
-
-    @if(Auth::user() && Auth::user()->amI())
+    @if(session('success'))
+        <div class="callout success">
+            {{session('success')}}
+        </div>
+    @endif
     <div class="card-section">
+            <a href="/chusqers/{{$chusqer->id}}/like" class="@auth{{\App\Like::hasUserLiked($chusqer)? "alert button" : "button"}}@endauth
+            @guest button @endguest">@auth{{\App\Like::hasUserLiked($chusqer)? "No like!" : "like!"}}@endauth @guest Me gusta!
+                @endguest</a><a href="/{{$chusqer->id}}/likes">{{$chusqer->likes->count() == 0 ? '' : "Likes:" . $chusqer->likes->count()}}</a>
+        @if(Auth::user() && Auth::user()->amI())
         @can('update', $chusqer)
             <a href="{{ Route('chusqers.edit', $chusqer) }}" class="button warning">Editar</a>
         @endcan

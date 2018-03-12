@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Chusqer;
 use App\Hashtag;
 use App\Http\Requests\CreateChusqerRequest;
+use App\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -20,10 +21,43 @@ class ChusqersController extends Controller
      */
     public function show(Chusqer $chusqer)
     {
-        return view('chusqers.show', [
+
+        return view('chusqers.showChusqer', [
             'chusqer' => $chusqer
         ]);
     }
+
+    /**
+     * @param $chusqerId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function like($chusqerId)
+    {
+        $user = Auth::user();
+        $like = Like::findLike($chusqerId, $user->id);
+
+       if ($like == null) {
+            Like::create([
+                'chusqer_id' => $chusqerId,
+                'user_id' => $user->id,
+            ]);
+           $message = "Has dado like";
+       }else{
+                $like->delete();
+           $message = "Has quitado el like";
+            }
+
+        return redirect("/chusqers/{$chusqerId}")->with('success', $message);
+    }
+
+    public function showLikesList($chusqerId){
+            $chusqer = Chusqer::find($chusqerId);
+
+            return view('chusqers.likes', [
+                    'chusqer' => $chusqer,
+                ]);
+    }
+
 
     /**
      * Método para mostrar el formulario de alta de una nuevo mensaje Chusqer.
